@@ -6,10 +6,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ImóvelFácil</title>
+    <!-- App JavaScript -->
+    <script defer src="{% static 'imovel_facil/js/app.js' %}"></script>
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.3/dist/cdn.min.js"></script>
     <!-- Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
 
     <link rel="shortcut icon" href="{% static '/imovel_facil/img/logo.ico' %}" type="image/x-icon">
     <style>
@@ -18,25 +21,12 @@
         }
     </style>
     <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('imovelApp', () => ({
-                mobileMenu: false,
-                modalOpen: false,
-                currentProperty: null,
-                properties: {{ imoveis_json | safe }},
-            showProperty(id) 
-                {
-                const property = this.properties.find(p => p.id === id)
-                    this.currentProperty = property || null
-                    this.modalOpen = !!property
-            }
-            }));
-        });
+        // Esta variável será usada para passar dados do Django para o JavaScript
+        window.IMOVEIS_DATA = {{ imoveis_json | safe }};
     </script>
 </head>
 
-<body x-data="imovelApp()" class=" bg-gray-100 font-sans leading-normal tracking-normal">
-
+<body x-data="imovelApp({imoveis: window.IMOVEIS_DATA})" class=" bg-gray-100 font-sans leading-normal tracking-normal">
     <!-- Cabeçalho com Navegação -->
     <header class="bg-blue-600 text-white sticky top-0 z-40 shadow-md">
         <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -106,8 +96,8 @@
                 <div class="p-4">
                     <h3 class="text-xl font-semibold mb-2">{{ imovel.nome }}</h3>
                     <p class="text-gray-600 mb-4">
-                        {{ imovel.quarto }} quartos,
-                        {{ imovel.casa_de_banho }} casa de banho,
+                        {{ imovel.quarto }} quarto(s),
+                        {{ imovel.casa_de_banho }} casa(s) de banho,
                         {{ imovel.area }}m²
                     </p>
                     <div class="flex justify-between items-center">
@@ -155,10 +145,6 @@
                         </div>
                         <p class="text-gray-700 mb-4" x-text="currentProperty?.endereco || ''"></p>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                            <div class="bg-blue-50 p-3 rounded-lg text-center">
-                                <p class="text-gray-600 text-sm">Categoria</p>
-                                <p class="font-semibold" x-text="currentProperty?.categoria || ''"></p>
-                            </div>
                             <div class="bg-blue-50 p-3 rounded-lg text-center">
                                 <p class="text-gray-600 text-sm">Cozinha</p>
                                 <p class="font-semibold" x-text="currentProperty?.cozinha || ''"></p>
@@ -258,8 +244,8 @@
                 </div>
                 <p class="text-gray-600 mb-4">"Encontrei o apartamento dos meus sonhos graças à ImóvelFácil. O processo
                     foi rápido e a equipa foi extremamente prestável durante todo o processo."</p>
-                <div class="font-semibold">Maria Silva</div>
-                <div class="text-sm text-gray-500">Lisboa</div>
+                <div class="font-semibold">Ana Luísa Pereira</div>
+                <div class="text-sm text-gray-500">Maia</div>
             </div>
             <!-- Segundo Testemunho -->
             <div class="bg-white p-6 rounded-lg shadow-md">
@@ -287,11 +273,11 @@
                         </svg>
                     </div>
                 </div>
-                <p class="text-gray-600 mb-4">"Após procurar por meses, finalmente encontramos a casa perfeita para a
-                    nossa família através da ImóvelFácil. A plataforma facilitou a pesquisa e as visitas foram agendadas
+                <p class="text-gray-600 mb-4">"Após procurar por meses, finalmente, encontramos a casa perfeita para a
+                    nossa família, através da ImóvelFácil. A plataforma facilitou a pesquisa e as visitas foram agendadas
                     rapidamente. Recomendo a todos!"</p>
                 <div class="font-semibold">Daniel Marques</div>
-                <div class="text-sm text-gray-500">Porto</div>
+                <div class="text-sm text-gray-500">Maia</div>
             </div>
 
             <!-- Terceiro Testemunho -->
@@ -321,7 +307,7 @@
                     </div>
                 </div>
                 <p class="text-gray-600 mb-4">"Como vendedor, fiquei impressionado com a rapidez com que consegui vender
-                    o meu terreno através da ImóvelFácil. Em menos de um mês recebi várias propostas e o apoio jurídico
+                    o meu terreno através da ImóvelFácil. Em menos de um mês, recebi várias propostas e o apoio jurídico
                     gratuito tornou todo o processo seguro e transparente."</p>
                 <div class="font-semibold">João Sá</div>
                 <div class="text-sm text-gray-500">Porto</div>
@@ -333,49 +319,7 @@
     <section id="contact" class="container mx-auto mt-16 px-4 mb-12">
         <div class="bg-blue-100 rounded-lg p-8 shadow-md">
             <h2 class="text-3xl font-bold text-center mb-8 text-blue-800">Contato</h2>
-            <form x-data="{ 
-                nome: '', 
-                email: '', 
-                mensagem: '',
-                errors: {},
-                enviando: false,
-                enviado: false,
-                
-                validateForm() {
-                    this.errors = {};
-                    
-                    if (!this.nome.trim()) this.errors.nome = 'O nome é obrigatório.';
-                    
-                    if (!this.email.trim()) {
-                        this.errors.email = 'O email é obrigatório.';
-                    } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(this.email)) {
-                        this.errors.email = 'Email inválido.';
-                    }
-                    
-                    if (!this.mensagem.trim()) this.errors.mensagem = 'A mensagem é obrigatória.';
-                    
-                    return Object.keys(this.errors).length === 0;
-                },
-                
-                submitForm() {
-                    if (this.validateForm()) 
-                    {
-                        this.enviando = true;
-                            
-                        // Simulação de envio, substituir por chamada AJAX real
-                        setTimeout(() => {
-                        this.enviando = false;
-                        this.enviado = true;
-                        this.nome = '';
-                        this.email = '';
-                        this.mensagem = '';
-                            
-                        // Reset após 3 segundos
-                        setTimeout(() => this.enviado = false, 3000);
-                        }, 1500);
-                    }
-                }
-            }" class="max-w-lg mx-auto" @submit.prevent="submitForm">
+            <form x-data="contactForm()" class="max-w-lg mx-auto" @submit.prevent="submitForm">
                 <div class="mb-4">
                     <label for="nome" class="block text-gray-700 mb-2">Nome</label>
                     <input type="text" id="nome" x-model="nome" :class="{'border-red-500': errors.nome}"
