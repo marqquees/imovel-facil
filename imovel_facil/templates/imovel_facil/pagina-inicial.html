@@ -1,0 +1,423 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ImóvelFácil</title>
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.3/dist/cdn.min.js"></script>
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+    <link rel="shortcut icon" href="{% static '/imovel_facil/img/logo.ico' %}" type="image/x-icon">
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('imovelApp', () => ({
+                mobileMenu: false,
+                modalOpen: false,
+                currentProperty: null,
+                properties: {{ imoveis_json | safe }},
+            showProperty(id) 
+                {
+                const property = this.properties.find(p => p.id === id)
+                    this.currentProperty = property || null
+                    this.modalOpen = !!property
+            }
+            }));
+        });
+    </script>
+</head>
+
+<body x-data="imovelApp()" class=" bg-gray-100 font-sans leading-normal tracking-normal">
+
+    <!-- Cabeçalho com Navegação -->
+    <header class="bg-blue-600 text-white sticky top-0 z-40 shadow-md">
+        <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="{% static '/imovel_facil/img/logo.ico' %}" alt="Logo ImóvelFácil" class="h-12 w-12 mr-4">
+                <h1 class="text-2xl font-bold">ImóvelFácil</h1>
+            </div>
+
+            <!-- Menu de Navegação Desktop -->
+            <div class="hidden md:flex space-x-6">
+                <a href="#home" class="hover:text-blue-200 transition">Início</a>
+                <a href="#properties" class="hover:text-blue-200 transition">Imóveis</a>
+                <a href="#about" class="hover:text-blue-200 transition">Sobre Nós</a>
+                <a href="#witness" class="hover:text-blue-200 transition">Clientes</a>
+                <a href="#contact" class="hover:text-blue-200 transition">Contato</a>
+            </div>
+
+            <!-- Menu Mobile Hamburger -->
+            <div class="md:hidden">
+                <button @click="mobileMenu = !mobileMenu" class="focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Menu Mobile Dropdown -->
+        <div x-show="mobileMenu" class="md:hidden">
+            <div class="px-4 pt-2 pb-4 space-y-2">
+                <a href="#home" class="block hover:bg-blue-700 py-2">Início</a>
+                <a href="#properties" class="block hover:bg-blue-700 py-2">Imóveis</a>
+                <a href="#about" class="block hover:bg-blue-700 py-2">Sobre</a>
+                <a href="#contact" class="block hover:bg-blue-700 py-2">Contato</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Secção de Destaque -->
+    <section id="home" class="container mx-auto mt-10 px-4">
+        <div class="grid md:grid-cols-2 gap-8 items-center">
+            <div>
+                <h2 class="text-4xl font-bold text-blue-800 mb-4">Encontre seu Imóvel Perfeito</h2>
+                <p class="text-gray-600 mb-6">Navegue por nossa seleção de casas, apartamentos e terrenos. Seu novo lar
+                    está aqui!</p>
+                <a href="#properties"
+                    class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">Ver Imóveis</a>
+            </div>
+            <div>
+                <img src="{% static '/imovel_facil/img/' %}{{ imovel_destaque.imagem }}"
+                    alt="{{ imovel_destaque.nome }}" loading="lazy" class="rounded-lg shadow-lg">
+            </div>
+        </div>
+    </section>
+
+    <!-- Secção de Imóveis -->
+    <section id="properties" class="container mx-auto mt-16 px-4">
+        <h2 class="text-4xl font-bold text-center text-blue-800 mb-10">Imóveis</h2>
+        <div class="grid md:grid-cols-3 gap-8">
+            {% for imovel in imoveis %}
+            <!-- Cartão de Imóvel -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <img src="{% static '/imovel_facil/img/' %}{{ imovel.imagem }}" alt="{{ imovel.nome }}" loading="lazy"
+                    class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <h3 class="text-xl font-semibold mb-2">{{ imovel.nome }}</h3>
+                    <p class="text-gray-600 mb-4">
+                        {{ imovel.quarto }} quartos,
+                        {{ imovel.casa_de_banho }} casa de banho,
+                        {{ imovel.area }}m²
+                    </p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-blue-600 font-bold text-lg">€ {{ imovel.preco }}</span>
+                        <button @click="showProperty({{ imovel.id }})"
+                            class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Detalhes</button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Modal de Detalhes do Imóvel -->
+    <div x-show="modalOpen" class="fixed inset-0 z-50 overflow-y-auto"
+        x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-300"
+        x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" x-cloak>
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-black opacity-50" @click="modalOpen = false"></div>
+            <div class="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all w-full max-w-3xl z-10">
+                <div class="relative" x-show="currentProperty">
+                    <!-- Cabeçalho com Imagem de Capa -->
+                    <div class="relative h-64">
+                        <img :src="'{% static '/imovel_facil/img/' %}' + (currentProperty?.imagem || '')" loading="lazy"
+                            class="w-full h-full object-cover" :alt="currentProperty?.nome || ''">
+                        <div class="absolute top-0 right-0 m-4">
+                            <button @click="modalOpen = false"
+                                class="bg-white text-gray-800 rounded-full p-2 hover:bg-gray-200 focus:outline-none">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Conteúdo -->
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-2xl font-bold text-blue-800" x-text="currentProperty?.nome || ''"></h2>
+                            <span class="text-blue-600 font-bold text-xl">
+                                <span x-text="currentProperty?.preco || ''"></span></span>
+                        </div>
+                        <p class="text-gray-700 mb-4" x-text="currentProperty?.endereco || ''"></p>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                            <div class="bg-blue-50 p-3 rounded-lg text-center">
+                                <p class="text-gray-600 text-sm">Categoria</p>
+                                <p class="font-semibold" x-text="currentProperty?.categoria || ''"></p>
+                            </div>
+                            <div class="bg-blue-50 p-3 rounded-lg text-center">
+                                <p class="text-gray-600 text-sm">Cozinha</p>
+                                <p class="font-semibold" x-text="currentProperty?.cozinha || ''"></p>
+                            </div>
+                            <div class="bg-blue-50 p-3 rounded-lg text-center">
+                                <p class="text-gray-600 text-sm">Sala</p>
+                                <p class="font-semibold" x-text="currentProperty?.sala || ''"></p>
+                            </div>
+                            <div class="bg-blue-50 p-3 rounded-lg text-center">
+                                <p class="text-gray-600 text-sm">Quarto</p>
+                                <p class="font-semibold" x-text="currentProperty?.quarto || ''"></p>
+                            </div>
+                            <div class="bg-blue-50 p-3 rounded-lg text-center">
+                                <p class="text-gray-600 text-sm">Casa de Banho</p>
+                                <p class="font-semibold" x-text="currentProperty?.casa_de_banho || ''"></p>
+                            </div>
+                            <div class="bg-blue-50 p-3 rounded-lg text-center">
+                                <p class="text-gray-600 text-sm">Garagem</p>
+                                <p class="font-semibold" x-text="currentProperty?.garagem || ''"></p>
+                            </div>
+                            <div class="bg-blue-50 p-3 rounded-lg text-center">
+                                <p class="text-gray-600 text-sm">Número de Cómodo</p>
+                                <p class="font-semibold" x-text="currentProperty?.numero_de_comodo || ''"></p>
+                            </div>
+                            <div class="bg-blue-50 p-3 rounded-lg text-center">
+                                <p class="text-gray-600 text-sm">Área</p>
+                                <p class="font-semibold" x-text="(currentProperty?.area || '') + ' m²'"></p>
+                            </div>
+                        </div>
+                        <div class="mb-6">
+                            <h3 class="text-lg font-semibold mb-2">Detalhes</h3>
+                            <p class="text-gray-700" x-text="currentProperty?.descricao || ''"></p>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button
+                                class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">Agendar
+                                Visita</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Secção Sobre Nós -->
+    <section id="about" class="container mx-auto mt-16 px-4 bg-white py-12 rounded-lg shadow-md">
+        <div class="grid md:grid-cols-2 gap-8 items-center">
+            <div>
+                <h2 class="text-3xl font-bold text-blue-800 mb-4">Sobre Nós</h2>
+                <p class="text-gray-600 mb-4">
+                    Somos uma imobiliária comprometida em ajudar você a encontrar o imóvel dos seus sonhos.
+                    Com mais de 10 anos de experiência no mercado, oferecemos um serviço personalizado e transparente.
+                </p>
+                <ul class="space-y-2 text-gray-600">
+                    <li>✓ Amplo catálogo de imóveis.</li>
+                    <li>✓ Assessoria jurídica gratuita.</li>
+                    <li>✓ Suporte dedicado 24h.</li>
+                </ul>
+            </div>
+            <div>
+                <img src="{% static '/imovel_facil/img/equipa.jpg' %}" alt="Equipe ImóvelFácil" loading="lazy"
+                    class="rounded-lg shadow-lg">
+            </div>
+        </div>
+    </section>
+
+    <!-- Secção das Testemunhas -->
+    <section id="witness" class="container mx-auto mt-16 px-4">
+        <h2 class="text-3xl font-bold text-center mb-10 text-blue-800">O Que Dizem os Nossos Clientes</h2>
+        <div class="grid md:grid-cols-3 gap-8">
+            <!-- Primeiro Testemunho -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="flex items-center mb-4">
+                    <div class="text-yellow-400 flex">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                            <path
+                                d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg>
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                            <path
+                                d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg>
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                            <path
+                                d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg>
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                            <path
+                                d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg>
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                            <path
+                                d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg>
+                    </div>
+                </div>
+                <p class="text-gray-600 mb-4">"Encontrei o apartamento dos meus sonhos graças à ImóvelFácil. O processo
+                    foi rápido e a equipa foi extremamente prestável durante todo o processo."</p>
+                <div class="font-semibold">Maria Silva</div>
+                <div class="text-sm text-gray-500">Lisboa</div>
+            </div>
+            <!-- Segundo Testemunho -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="flex items-center mb-4">
+                    <div class="text-yellow-400 flex">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                            <path
+                                d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg>
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                            <path
+                                d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg>
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                            <path
+                                d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg>
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                            <path
+                                d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg>
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                            <path
+                                d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg>
+                    </div>
+                </div>
+                <p class="text-gray-600 mb-4">"Após procurar por meses, finalmente encontramos a casa perfeita para a
+                    nossa família através da ImóvelFácil. A plataforma facilitou a pesquisa e as visitas foram agendadas
+                    rapidamente. Recomendo a todos!"</p>
+                <div class="font-semibold">Daniel Marques</div>
+                <div class="text-sm text-gray-500">Porto</div>
+            </div>
+
+            <!-- Terceiro Testemunho -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="flex items-center mb-4">
+                    <div class="text-yellow-400 flex">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                            <path
+                                d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg>
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                            <path
+                                d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg>
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                            <path
+                                d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg>
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                            <path
+                                d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg>
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                            <path
+                                d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg>
+                    </div>
+                </div>
+                <p class="text-gray-600 mb-4">"Como vendedor, fiquei impressionado com a rapidez com que consegui vender
+                    o meu terreno através da ImóvelFácil. Em menos de um mês recebi várias propostas e o apoio jurídico
+                    gratuito tornou todo o processo seguro e transparente."</p>
+                <div class="font-semibold">João Sá</div>
+                <div class="text-sm text-gray-500">Porto</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Secção de Contato -->
+    <section id="contact" class="container mx-auto mt-16 px-4 mb-12">
+        <div class="bg-blue-100 rounded-lg p-8 shadow-md">
+            <h2 class="text-3xl font-bold text-center mb-8 text-blue-800">Contato</h2>
+            <form x-data="{ 
+                nome: '', 
+                email: '', 
+                mensagem: '',
+                errors: {},
+                enviando: false,
+                enviado: false,
+                
+                validateForm() {
+                    this.errors = {};
+                    
+                    if (!this.nome.trim()) this.errors.nome = 'O nome é obrigatório.';
+                    
+                    if (!this.email.trim()) {
+                        this.errors.email = 'O email é obrigatório.';
+                    } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(this.email)) {
+                        this.errors.email = 'Email inválido.';
+                    }
+                    
+                    if (!this.mensagem.trim()) this.errors.mensagem = 'A mensagem é obrigatória.';
+                    
+                    return Object.keys(this.errors).length === 0;
+                },
+                
+                submitForm() {
+                    if (this.validateForm()) 
+                    {
+                        this.enviando = true;
+                            
+                        // Simulação de envio, substituir por chamada AJAX real
+                        setTimeout(() => {
+                        this.enviando = false;
+                        this.enviado = true;
+                        this.nome = '';
+                        this.email = '';
+                        this.mensagem = '';
+                            
+                        // Reset após 3 segundos
+                        setTimeout(() => this.enviado = false, 3000);
+                        }, 1500);
+                    }
+                }
+            }" class="max-w-lg mx-auto" @submit.prevent="submitForm">
+                <div class="mb-4">
+                    <label for="nome" class="block text-gray-700 mb-2">Nome</label>
+                    <input type="text" id="nome" x-model="nome" :class="{'border-red-500': errors.nome}"
+                        class="w-full px-3 py-2 border rounded-md" placeholder="Nome...">
+                    <p x-show="errors.nome" x-text="errors.nome" class="text-red-500 text-sm mt-1"></p>
+                </div>
+                <div class="mb-4">
+                    <label for="email" class="block text-gray-700 mb-2">Email</label>
+                    <input type="text" id="email" x-model="email" :class="{'border-red-500': errors.email}"
+                        class="w-full px-3 py-2 border rounded-md" placeholder="Email...">
+                    <p x-show="errors.email" x-text="errors.email" class="text-red-500 text-sm mt-1"></p>
+                </div>
+                <div class="mb-4">
+                    <label for="mensagem" class="block text-gray-700 mb-2">Mensagem</label>
+                    <textarea id="mensagem" x-model="mensagem" :class="{'border-red-500': errors.mensagem}"
+                        class="w-full px-3 py-2 border rounded-md" placeholder="Mensagem..."></textarea>
+                    <p x-show="errors.mensagem" x-text="errors.mensagem" class="text-red-500 text-sm mt-1"></p>
+                </div>
+                <div class="text-center">
+                    <button type="submit" :disabled="enviando"
+                        class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition disabled:opacity-50">
+                        <span x-show="!enviando">Enviar</span>
+                        <span x-show="enviando">Enviando...</span>
+                    </button>
+                    <div x-show="enviado" class="mt-4 text-green-600 font-semibold">
+                        Mensagem enviada com sucesso! Entraremos em contacto em breve.
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Rodapé -->
+    <footer class="bg-blue-800 text-white py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2025 ImóvelFácil</p>
+            <div class="mt-4 space-x-4">
+                <a href="#" class="hover:text-blue-300">Políticas de Privacidade</a>
+                <a href="#" class="hover:text-blue-300">Termos de Uso</a>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>
