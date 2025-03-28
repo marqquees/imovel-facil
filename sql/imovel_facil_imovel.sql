@@ -18,14 +18,14 @@ USE `imovel_facil`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `casa`
+-- Table structure for table `imovel`
 --
 
-DROP TABLE IF EXISTS `casa`;
+DROP TABLE IF EXISTS `imovel`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `casa` (
-  `idcasa` int NOT NULL,
+CREATE TABLE `imovel` (
+  `id` int NOT NULL,
   `categoria` varchar(20) NOT NULL,
   `cozinha` int NOT NULL,
   `sala` int NOT NULL,
@@ -37,21 +37,21 @@ CREATE TABLE `casa` (
   `endereco` varchar(200) NOT NULL,
   `preco` decimal(10,0) NOT NULL,
   `descricao` varchar(200) NOT NULL,
-  PRIMARY KEY (`idcasa`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `casa`
+-- Dumping data for table `imovel`
 --
 
-LOCK TABLES `casa` WRITE;
-/*!40000 ALTER TABLE `casa` DISABLE KEYS */;
-INSERT INTO `casa` VALUES 
-(1,'Apartamento',1,1,2,1,1,5,75,'Rua das Flores, 123, Lisboa',180000,'Apartamento acolhedor com boa localização, próximo a transportes públicos e comércio local.'),
-(2,'Moradia',1,2,3,2,2,8,150,'Avenida do Sol, 45, Porto',350000,'Casa familiar com jardim, terraço e vista para o mar. Zona residencial tranquila com fácil acesso a escolas e serviços.'),
-(3,'Mansão',2,3,5,4,3,14,320,'Quinta das Oliveiras, Sintra',950000,'Propriedade de luxo com piscina, jardim amplo e acabamentos de alta qualidade. Localizada em zona exclusiva com segurança privada.');
-/*!40000 ALTER TABLE `casa` ENABLE KEYS */;
+LOCK TABLES `imovel` WRITE;
+/*!40000 ALTER TABLE `imovel` DISABLE KEYS */;
+INSERT INTO `imovel` 
+VALUES (1,'Moradia',1,1,3,2,2,7,125,'Rua das Flores, 123, Chaves',380000,'Casa familiar com jardim, garagem e com boa localização, próximo a transportes públicos e comércio local.'),
+(2,'Moradia',1,1,2,1,1,5,70,'Alameda do Sol, 45, Oliveira do Hospital',180000,'Casa de verão com jardim, terraço e vista para a Serra da Estrela. Zona rural e tranquila com fácil acesso a inúmeros serviços.'),
+(3,'Mansão',1,2,5,4,3,12,320,'Quinta dos Carvalhos, Sintra',950000,'Propriedade de luxo com piscina, jardim amplo e acabamentos de alta qualidade. Localizada em zona exclusiva com segurança privada.');
+/*!40000 ALTER TABLE `imovel` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -63,4 +63,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-03-27 12:21:26
+-- Dump completed on 2025-03-28 16:00:57
