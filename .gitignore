@@ -1,0 +1,56 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Django
+*.log
+*.pot
+db.sqlite3
+media/
+static/admin/
+staticfiles/
+
+# Ambiente virtual
+venv/
+env/
+ENV/
+
+# Configuração local
+.env
+local_settings.py
+
+# Arquivos de distribuição
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Arquivos de IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.suo
+.ntvs_analysis.dat
+.vs/
+
+# Outros
+.DS_Store
+.coverage
+htmlcov/
+coverage/
+.pytest_cache/

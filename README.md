@@ -1,5 +1,3 @@
-Aqui está a documentação convertida para Markdown:
-
 # Documentação do Projeto ImóvelFácil
 
 ## Visão Geral
